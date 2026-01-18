@@ -1,0 +1,129 @@
+[gd_scene load_steps=8 format=3 uid="uid://d1uqtum4t7uku"]
+
+[ext_resource type="PackedScene" uid="uid://bswguv2aqtmrf" path="res://scenes/background.tscn" id="1_tbgi4"]
+[ext_resource type="Script" uid="uid://b77rwkobcom3j" path="res://scripts/Main.cs" id="1_tefeu"]
+[ext_resource type="PackedScene" uid="uid://d3uac7wjorfa8" path="res://scenes/pipes.tscn" id="2_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://daup3whagkygu" path="res://scenes/floor.tscn" id="3_tbgi4"]
+[ext_resource type="AudioStream" uid="uid://ckvulw0ujq0yp" path="res://scripts/wing-flap-1-6434.mp3" id="6_o6xl0"]
+[ext_resource type="AudioStream" uid="uid://c3160pmgb7511" path="res://scripts/splat-305791.mp3" id="7_85g3d"]
+[ext_resource type="PackedScene" uid="uid://enka6wakk8k7" path="res://scenes/bird.tscn" id="7_tipki"]
+
+[node name="main" type="Node2D"]
+script = ExtResource("1_tefeu")
+
+[node name="Pipes" parent="." instance=ExtResource("2_jyhfs")]
+
+[node name="Background" parent="." instance=ExtResource("1_tbgi4")]
+z_index = -2
+texture_filter = 1
+scroll_scale = Vector2(0.1, 0.1)
+scroll_offset = Vector2(-1036, -35)
+repeat_times = 3
+
+[node name="Bird" parent="." instance=ExtResource("7_tipki")]
+texture_filter = 1
+position = Vector2(167, 251)
+scale = Vector2(2.5, 2.5)
+motion_mode = 0
+
+[node name="Floor" parent="." instance=ExtResource("3_tbgi4")]
+z_index = 1
+position = Vector2(-114, 601)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="UI"]
+offset_left = 576.0
+offset_top = 50.0
+offset_right = 650.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 64
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameOverScreen" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="ColorRect" parent="UI/GameOverScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.2, 0.2, 0.9)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverScreen/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameOverLabel" type="Label" parent="UI/GameOverScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 48
+text = "GAME OVER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="UI/GameOverScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 32
+text = "Score: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HighScoreLabel" type="Label" parent="UI/GameOverScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 32
+text = "High Score: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ClickLabel" type="Label" parent="UI/GameOverScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 24
+text = "Click to Restart"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Sounds" type="Node" parent="."]
+
+[node name="FlapSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("6_o6xl0")
+pitch_scale = 1.75
+
+[node name="HitSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("7_85g3d")
+pitch_scale = 0.45
+
+[node name="ScoreSound" type="AudioStreamPlayer" parent="Sounds"]

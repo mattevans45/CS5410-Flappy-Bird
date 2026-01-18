@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://d3uac7wjorfa8"]
+
+[ext_resource type="Script" uid="uid://rm6shqd51moq" path="res://scripts/Pipes.cs" id="1_pipes"]
+
+[node name="Pipes" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1_pipes")

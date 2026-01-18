@@ -1,0 +1,81 @@
+[gd_scene load_steps=10 format=3 uid="uid://b8nimb5anw8sy"]
+
+[ext_resource type="PackedScene" uid="uid://enka6wakk8k7" path="res://scenes/bird.tscn" id="1_3vyb7"]
+[ext_resource type="Texture2D" uid="uid://cr22181merukg" path="res://assets/Player/StyleBird1/Bird1-1.png" id="2_qhqgy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o6xl0"]
+atlas = ExtResource("2_qhqgy")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tipki"]
+atlas = ExtResource("2_qhqgy")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_85g3d"]
+atlas = ExtResource("2_qhqgy")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_choun"]
+atlas = ExtResource("2_qhqgy")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qhqgy"]
+atlas = ExtResource("2_qhqgy")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qhqgy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o6xl0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tipki")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_85g3d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_choun")
+}],
+"loop": true,
+"name": &"flying",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qhqgy")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
+radius = 5.0
+height = 14.0
+
+[node name="Player" type="Node2D"]
+texture_filter = 1
+
+[node name="Bird" parent="." instance=ExtResource("1_3vyb7")]
+scale = Vector2(1, 1)
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="Bird"]
+texture_filter = 1
+scale = Vector2(0.99999994, 0.99999994)
+sprite_frames = SubResource("SpriteFrames_qhqgy")
+animation = &"idle"
+frame_progress = 0.23426577
+
+[node name="Camera2D2" type="Camera2D" parent="Bird"]
+scale = Vector2(0.99999976, 0.99999976)
+limit_top = 500
+limit_bottom = 500
+limit_smoothed = true
+position_smoothing_enabled = true
+rotation_smoothing_enabled = true
+editor_draw_limits = true
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Bird"]
+shape = SubResource("CapsuleShape2D_g2els")

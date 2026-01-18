@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://b8ajq01p78ayc"]
+
+[ext_resource type="Texture2D" uid="uid://mgifgxbxbfy0" path="res://assets/Tiles/Style 1/GreenPipe.tres" id="1_iwfiu"]
+
+[resource]
+atlas = ExtResource("1_iwfiu")
+region = Rect2(0, 0, 34, 60)
