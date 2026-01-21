@@ -5,10 +5,10 @@
 [ext_resource type="PackedScene" uid="uid://d3uac7wjorfa8" path="res://scenes/pipes.tscn" id="2_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://daup3whagkygu" path="res://scenes/floor.tscn" id="3_tbgi4"]
 [ext_resource type="FontFile" uid="uid://bd4rqaj8gnyhv" path="res://assets/fonts/Silkscreen-Regular.ttf" id="5_font"]
-[ext_resource type="AudioStream" uid="uid://ckvulw0ujq0yp" path="res://scripts/wing-flap-1-6434.mp3" id="6_o6xl0"]
-[ext_resource type="AudioStream" uid="uid://c3160pmgb7511" path="res://scripts/splat-305791.mp3" id="7_85g3d"]
+[ext_resource type="AudioStream" uid="uid://ckvulw0ujq0yp" path="res://assets/Audio/wing-flap-1-6434.mp3" id="6_o6xl0"]
+[ext_resource type="AudioStream" uid="uid://c3160pmgb7511" path="res://assets/Audio/splat-305791.mp3" id="7_85g3d"]
 [ext_resource type="PackedScene" uid="uid://enka6wakk8k7" path="res://scenes/bird.tscn" id="7_tipki"]
-[ext_resource type="AudioStream" uid="uid://cx5q7hiiqwf38" path="res://assets/point.mp3" id="8_tipki"]
+[ext_resource type="AudioStream" uid="uid://cx5q7hiiqwf38" path="res://assets/Audio/point.mp3" id="8_tipki"]
 [ext_resource type="PackedScene" uid="uid://ckol5pcc70mlu" path="res://scenes/start_screen.tscn" id="9_start"]
 [ext_resource type="PackedScene" uid="uid://k60igdnw6cjk" path="res://scenes/game_over_screen.tscn" id="10_gameover"]
 
@@ -41,9 +41,9 @@ position = Vector2(0, 571)
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="ScoreLabel" type="Label" parent="UI"]
-offset_left = 576.0
+offset_left = 426.0
 offset_top = 50.0
-offset_right = 650.0
+offset_right = 726.0
 offset_bottom = 120.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)

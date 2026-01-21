@@ -12,4 +12,3 @@ MinHeight = 100.0
 MaxHeight = 450.0
 
 [node name="PipePair" parent="." instance=ExtResource("2_3ahhd")]
-visible = false

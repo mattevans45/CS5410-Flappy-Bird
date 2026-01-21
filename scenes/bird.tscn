@@ -95,7 +95,6 @@ motion_mode = 1
 script = ExtResource("1_hq4t0")
 Speed = 250.0
 MinRotation = 0.0
-TiltDownThreshold = 500.0
 CeilingY = 0.0
 metadata/_edit_group_ = true
 
@@ -112,8 +111,9 @@ texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_3po83")
 animation = &"flying"
 autoplay = "idle"
+frame_progress = 0.8829174
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 1.0000001)
+position = Vector2(0, 1.1920929e-07)
 scale = Vector2(1.1, 0.87)
 shape = SubResource("CapsuleShape2D_hq4t0")

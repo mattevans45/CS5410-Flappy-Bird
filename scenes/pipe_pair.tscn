@@ -13,7 +13,7 @@ size = Vector2(128, 1000)
 size = Vector2(128, 1000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
-size = Vector2(10, 200)
+size = Vector2(14, 243.5)
 
 [node name="PipePair" type="Node2D"]
 script = ExtResource("1_m2bs7")
@@ -36,15 +36,15 @@ region_enabled = true
 region_rect = Rect2(5, 36, 32, 124)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe"]
-position = Vector2(62.4, -497)
+position = Vector2(63, -498)
 shape = SubResource("RectangleShape2D_pipe")
 
 [node name="HitArea" type="Area2D" parent="TopPipe"]
-position = Vector2(-13, 5)
+position = Vector2(-13, 7)
 collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe/HitArea"]
-position = Vector2(77.8, -497)
+position = Vector2(78, -504)
 shape = SubResource("RectangleShape2D_hit_top")
 
 [node name="BottomPipe" type="StaticBody2D" parent="."]
@@ -75,7 +75,7 @@ position = Vector2(64, 500)
 shape = SubResource("RectangleShape2D_hit_bottom")
 
 [node name="ScoreArea" type="Area2D" parent="."]
-position = Vector2(141, 15)
+position = Vector2(143, -4)
 collision_layer = 0
 metadata/_edit_group_ = true
 
