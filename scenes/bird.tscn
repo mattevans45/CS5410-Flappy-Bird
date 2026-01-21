@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://enka6wakk8k7"]
+[gd_scene load_steps=15 format=3 uid="uid://enka6wakk8k7"]
 
 [ext_resource type="Script" uid="uid://ca5lqyctq35g3" path="res://scripts/Bird.cs" id="1_hq4t0"]
+[ext_resource type="Texture2D" uid="uid://ch4jibam2cmup" path="res://assets/Player/StyleBird1/AllBird1.png" id="2_hq4t0"]
 [ext_resource type="Texture2D" uid="uid://cr22181merukg" path="res://assets/Player/StyleBird1/Bird1-1.png" id="2_twsrt"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o6xl0"]
@@ -18,6 +19,22 @@ region = Rect2(32, 0, 16, 16)
 [sub_resource type="AtlasTexture" id="AtlasTexture_choun"]
 atlas = ExtResource("2_twsrt")
 region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_twsrt"]
+atlas = ExtResource("2_hq4t0")
+region = Rect2(0, 80, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b7mtg"]
+atlas = ExtResource("2_hq4t0")
+region = Rect2(16, 80, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bdh3x"]
+atlas = ExtResource("2_hq4t0")
+region = Rect2(32, 80, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jggmu"]
+atlas = ExtResource("2_hq4t0")
+region = Rect2(48, 80, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qhqgy"]
 atlas = ExtResource("2_twsrt")
@@ -44,6 +61,23 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_twsrt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b7mtg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bdh3x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jggmu")
+}],
+"loop": true,
+"name": &"flying1_1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_qhqgy")
 }],
 "loop": true,
@@ -52,28 +86,34 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hq4t0"]
-radius = 7.0
-height = 14.0
+radius = 8.0
+height = 16.0
 
 [node name="Bird" type="CharacterBody2D"]
 collision_mask = 2
 motion_mode = 1
 script = ExtResource("1_hq4t0")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-texture_filter = 1
-sprite_frames = SubResource("SpriteFrames_3po83")
-animation = &"flying"
-frame = 1
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_hq4t0")
+Speed = 250.0
+MinRotation = 0.0
+TiltDownThreshold = 500.0
+CeilingY = 0.0
+metadata/_edit_group_ = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
-offset = Vector2(300, 0)
-limit_left = -500
-limit_top = 0
-limit_bottom = 700
+limit_top = 100
+limit_bottom = 548
 limit_smoothed = true
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+self_modulate = Color(1.353256, 1.353256, 1.353256, 1)
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_3po83")
+animation = &"flying"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1.0000001)
+scale = Vector2(1.1, 0.87)
+shape = SubResource("CapsuleShape2D_hq4t0")

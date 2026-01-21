@@ -1,19 +1,19 @@
-[gd_scene load_steps=5 format=3 uid="uid://bxqfo2ofoesix"]
+[gd_scene load_steps=7 format=3 uid="uid://bxqfo2ofoesix"]
 
 [ext_resource type="Script" uid="uid://busx6t4js18e3" path="res://scripts/PipePair.cs" id="1_m2bs7"]
-[ext_resource type="Texture2D" uid="uid://gjaahfd424he" path="res://assets/Tiles/Style 1/PipeStyle1.png" id="2_e3hex"]
+[ext_resource type="Texture2D" uid="uid://dtxkk2vowkxna" path="res://assets/Tiles/Pipe.png" id="2_m2bs7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pipe"]
-size = Vector2(135.5, 994.5)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
-size = Vector2(10, 200)
+size = Vector2(128, 1000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hit_top"]
 size = Vector2(128, 1000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hit_bottom"]
 size = Vector2(128, 1000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
+size = Vector2(10, 200)
 
 [node name="PipePair" type="Node2D"]
 script = ExtResource("1_m2bs7")
@@ -27,58 +27,57 @@ collision_mask = 0
 [node name="Sprite2D" type="Sprite2D" parent="TopPipe"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, -1000)
-scale = Vector2(4, 4.4444447)
-texture = ExtResource("2_e3hex")
+position = Vector2(0, -434)
+scale = Vector2(4, 3.5)
+texture = ExtResource("2_m2bs7")
 centered = false
 flip_v = true
 region_enabled = true
-region_rect = Rect2(0, 0, 32, 225)
+region_rect = Rect2(5, 36, 32, 124)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe"]
-position = Vector2(62, -496)
+position = Vector2(62.4, -497)
 shape = SubResource("RectangleShape2D_pipe")
 
 [node name="HitArea" type="Area2D" parent="TopPipe"]
+position = Vector2(-13, 5)
 collision_layer = 2
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe/HitArea"]
-position = Vector2(64, -500)
+position = Vector2(77.8, -497)
 shape = SubResource("RectangleShape2D_hit_top")
 
 [node name="BottomPipe" type="StaticBody2D" parent="."]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 100)
+position = Vector2(0, 125)
 collision_layer = 2
 collision_mask = 0
 
 [node name="Sprite2D" type="Sprite2D" parent="BottomPipe"]
 texture_filter = 1
 texture_repeat = 2
-scale = Vector2(4, 4.4444447)
-texture = ExtResource("2_e3hex")
+scale = Vector2(4, 3.5)
+texture = ExtResource("2_m2bs7")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 32, 225)
+region_rect = Rect2(5, 36, 32, 124)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BottomPipe"]
-position = Vector2(65, 495)
+position = Vector2(64, 500)
 shape = SubResource("RectangleShape2D_pipe")
 
 [node name="HitArea" type="Area2D" parent="BottomPipe"]
 collision_layer = 2
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BottomPipe/HitArea"]
 position = Vector2(64, 500)
 shape = SubResource("RectangleShape2D_hit_bottom")
 
 [node name="ScoreArea" type="Area2D" parent="."]
-position = Vector2(131, 2)
+position = Vector2(141, 15)
 collision_layer = 0
-collision_mask = 1
+metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ScoreArea"]
 shape = SubResource("RectangleShape2D_score")

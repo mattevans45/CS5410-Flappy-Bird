@@ -3,12 +3,20 @@ using System;
 
 public partial class Bird : CharacterBody2D
 {
-	[Export] public float Speed { get; set; } = 300.0f;
-	[Export] public float JumpVelocity { get; set; } = -350.0f;
+	// Constants
+	private const uint PipeCollisionLayer = 2;
+	private const float CameraOffsetX = 100.0f;
+	
+	// Movement parameters matching original Flappy Bird
+	[Export] public float Speed { get; set; } = 200.0f; // Horizontal speed
+	[Export] public float JumpVelocity { get; set; } = -400.0f; // Flap strength
+	[Export] public float Gravity { get; set; } = 1000.0f; // Gravity (reduced from 1200)
+	[Export] public float MaxFallSpeed { get; set; } = 800.0f; // Terminal velocity
 
-	[Export] public float MinRotation { get; set; } = -0.5f;
-	[Export] public float MaxRotation { get; set; } = 1.5f;
-	[Export] public float RotationSpeed { get; set; } = 0.002f;
+	// Rotation parameters
+	[Export] public float MinRotation { get; set; } = -0.5f; // Max upward tilt (radians)
+	[Export] public float MaxRotation { get; set; } = 1.5f; // Max downward tilt (radians)
+	[Export] public float RotationScale { get; set; } = 0.002f; // Velocity to rotation conversion factor
 	[Export] public float CeilingY { get; set; } = 100.0f;
 
 	private Vector2 _startPosition;
@@ -18,17 +26,35 @@ public partial class Bird : CharacterBody2D
 
 	private AnimatedSprite2D _animatedSprite;
 	private Main _mainScene;
+	private Camera2D _camera;
 
 	public override void _Ready()
 	{
 		_startPosition = Position;
 		_mainScene = GetNode<Main>("/root/main");
 		_animatedSprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+		_camera = GetNodeOrNull<Camera2D>("Camera2D");
+
+		// Offset camera to position bird left of center
+		if (_camera != null)
+		{
+			_camera.Offset = new Vector2(CameraOffsetX, 0);
+		}
 
 		// Disable collisions until game starts
 		CollisionMask = 0;
 
 		_animatedSprite?.Play("idle");
+	}
+	
+	public override void _ExitTree()
+	{
+		// Clear references to allow garbage collection
+		_mainScene = null;
+		_animatedSprite = null;
+		_camera = null;
+		
+		base._ExitTree();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -51,9 +77,20 @@ public partial class Bird : CharacterBody2D
 	private void HandleFlyingPhysics(double delta)
 	{
 		Vector2 velocity = Velocity;
-		velocity += GetGravity() * (float)delta;
+		
+		// Apply custom gravity
+		velocity.Y += Gravity * (float)delta;
+		
+		// Cap fall speed (terminal velocity)
+		if (velocity.Y > MaxFallSpeed)
+		{
+			velocity.Y = MaxFallSpeed;
+		}
+		
+		// Constant horizontal speed
 		velocity.X = Speed;
 
+		// Ceiling collision
 		if (Position.Y < CeilingY)
 		{
 			Position = new Vector2(Position.X, CeilingY);
@@ -63,33 +100,24 @@ public partial class Bird : CharacterBody2D
 		Velocity = velocity;
 		MoveAndSlide();
 
-		// Rotation based on vertical velocity
-		float targetRot = velocity.Y * RotationSpeed;
-		Rotation = Mathf.Clamp(targetRot, MinRotation, MaxRotation);
-
-		// Check pipe collisions
-		if (IsFlying() && GetSlideCollisionCount() > 0)
-		{
-
-		for (int i = 0; i < GetSlideCollisionCount(); i++)
-		{
-			var collision = GetSlideCollision(i);
-			var collider = collision.GetCollider();
-
-			if (collider is StaticBody2D body && (body.CollisionLayer & 2) != 0)
-			{
-				OnPipeHit();
-				return;
-			}
-		}
-		}
+		// Rotate based on y velocity - simple function with clamping
+		Rotation = Mathf.Clamp(velocity.Y * RotationScale, MinRotation, MaxRotation);
 	}
 
 	private void HandleDeathPhysics(double delta)
 	{
 		Vector2 v = Velocity;
-		v += GetGravity() * (float)delta;
-		v.X = 0; // no horizontal movement
+		
+		// Apply custom gravity
+		v.Y += Gravity * (float)delta;
+		
+		// Cap fall speed
+		if (v.Y > MaxFallSpeed)
+		{
+			v.Y = MaxFallSpeed;
+		}
+		
+		v.X = 0; // No horizontal movement when dead
 		Velocity = v;
 
 		MoveAndSlide();
@@ -109,9 +137,10 @@ public partial class Bird : CharacterBody2D
 	public void StartFlying()
 	{
 		_isFlying = true;
+		Rotation = 0.0f;
 
 		// Only collide with pipes (layer 2)
-		CollisionMask = 2;
+		CollisionMask = PipeCollisionLayer;
 
 		_animatedSprite?.Play("flying");
 	}
@@ -125,7 +154,6 @@ public partial class Bird : CharacterBody2D
 		_isDead = true;
 
 		// Disable pipe collisions, bird will fall to floor naturally
-		// Floor.cs will detect collision and call StopFalling() + GameOver()
 		CollisionMask = 0;
 
 		Vector2 v = Velocity;
@@ -133,27 +161,25 @@ public partial class Bird : CharacterBody2D
 		Velocity = v;
 
 		_animatedSprite?.Play("idle");
+		
+		// Trigger game over immediately (plays hit sound and handles game over logic)
+		_mainScene?.GameOver();
 	}
 
-	// Public API methods expected by Main and Floor
+	// Public API methods
 	public bool IsDead() => _isDead;
 	public bool IsFlying() => _isFlying;
 	
-	public void Die()
-	{
-		// Already handled by OnPipeHit, this is called by Floor
-		// Keep for compatibility but don't duplicate logic
-		if (_isDead) return;
-		
-		_isDead = true;
-		_isFlying = false;
-		CollisionMask = 0;
-	}
-
 	public void StopFalling()
 	{
 		_isStopped = true;
 		Velocity = Vector2.Zero;
+		
+		// Stop the animation
+		if (_animatedSprite != null)
+		{
+			_animatedSprite.Stop();
+		}
 	}
 
 	public void Reset()

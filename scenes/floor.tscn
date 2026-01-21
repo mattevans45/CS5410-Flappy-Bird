@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=4 uid="uid://daup3whagkygu"]
 
 [ext_resource type="Script" uid="uid://bbrp6uj21tpbe" path="res://scripts/Floor.cs" id="1_floor"]
-[ext_resource type="TileSet" uid="uid://ctvoo7ebmk06g" path="res://scenes/floor_tileset.tres" id="2_whr1e"]
+[ext_resource type="TileSet" uid="uid://ctvoo7ebmk06g" path="res://assets/Tiles/Style 1/floor_tileset.tres" id="2_whr1e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_segment1"]
 size = Vector2(1152, 115)

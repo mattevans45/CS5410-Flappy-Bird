@@ -3,12 +3,12 @@ using System;
 
 public partial class Floor : Node2D
 {
-	[Export] public float FloorWidth { get; set; } = 1152.0f; // Width of one floor segment
-	private float _scrollSpeed = 0.0f;  // Floor is stationary in world space
+	[Export] public float FloorWidth { get; set; } = 1152.0f; 
+	
 	private bool _gameRunning = false;
 	private Bird _bird;
-	
-	// Cache segment references
+	private Main _mainScene; 
+
 	private Node2D _segment1;
 	private Node2D _segment2;
 	private Area2D _area1;
@@ -27,17 +27,16 @@ public partial class Floor : Node2D
 		if (_area1 != null)
 		{
 			_area1.BodyEntered += OnBodyEntered;
-			GD.Print("Floor: Area2D 1 collision connected");
 		}
 		
 		if (_area2 != null)
 		{
 			_area2.BodyEntered += OnBodyEntered;
-			GD.Print("Floor: Area2D 2 collision connected");
 		}
 		
 		// Get reference to bird
 		_bird = GetNode<Bird>("/root/main/Bird");
+		_mainScene = GetNode<Main>("/root/main");
 	}
 	
 	public override void _ExitTree()
@@ -63,48 +62,56 @@ public partial class Floor : Node2D
 	{
 		if (_gameRunning && _bird != null && _segment1 != null && _segment2 != null)
 		{
-			// Calculate world positions of floor segments
-			float segment1WorldX = GlobalPosition.X + _segment1.Position.X;
-			float segment2WorldX = GlobalPosition.X + _segment2.Position.X;
+			// Cache bird position for performance
 			float birdX = _bird.GlobalPosition.X;
 			
-			// If segment1 is too far behind the bird, move it ahead of segment2
-			if (segment1WorldX + FloorWidth < birdX - 300)
+			// Calculate left edge of each segment in world space
+			float segment1X = GlobalPosition.X + _segment1.Position.X;
+			float segment2X = GlobalPosition.X + _segment2.Position.X;
+			
+			// Find which segment is currently furthest right
+			float rightmostSegmentX = Mathf.Max(_segment1.Position.X, _segment2.Position.X);
+			
+			// If segment1 has moved too far behind the bird (fully off screen left)
+			if (segment1X + FloorWidth < birdX - 500)
 			{
-				_segment1.Position = new Vector2(_segment2.Position.X + FloorWidth, _segment1.Position.Y);
+				// Move it to the right of the rightmost segment
+				_segment1.Position = new Vector2(rightmostSegmentX + FloorWidth, _segment1.Position.Y);
 			}
 			
-			// If segment2 is too far behind the bird, move it ahead of segment1
-			if (segment2WorldX + FloorWidth < birdX - 300)
+			// Recalculate rightmost after segment1 may have moved
+			rightmostSegmentX = Mathf.Max(_segment1.Position.X, _segment2.Position.X);
+			
+			// If segment2 has moved too far behind the bird (fully off screen left)
+			if (segment2X + FloorWidth < birdX - 500)
 			{
-				_segment2.Position = new Vector2(_segment1.Position.X + FloorWidth, _segment2.Position.Y);
+				// Move it to the right of the rightmost segment
+				_segment2.Position = new Vector2(rightmostSegmentX + FloorWidth, _segment2.Position.Y);
 			}
 		}
 	}
-	
+
 	private void OnBodyEntered(Node2D body)
 	{
 		// Check if the bird collided with the floor
-		if (body is Bird bird)
+		if (body is Bird bird && _mainScene != null)
 		{
 			// Stop the bird from falling further
 			bird.StopFalling();
 			
 			// Notify Main scene about collision (if not already game over)
-			GetNode<Main>("/root/main").GameOver();
+			_mainScene.GameOver();
 		}
 	}
 	
 	public void StartScrolling()
 	{
 		_gameRunning = true;
-		GD.Print("Floor: Started scrolling");
 	}
 	
 	public void StopScrolling()
 	{
 		_gameRunning = false;
-		GD.Print("Floor: Stopped scrolling");
 	}
 	
 	public void Reset()
@@ -121,13 +128,6 @@ public partial class Floor : Node2D
 		{
 			_segment2.Position = new Vector2(FloorWidth, 0);
 		}
-		
-		GD.Print("Floor: Reset");
 	}
 	
-	public void SetScrollSpeed(float speed)
-	{
-		_scrollSpeed = speed;
-		GD.Print($"Floor: Scroll speed set to {speed}");
-	}
 }

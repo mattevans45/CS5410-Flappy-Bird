@@ -10,26 +10,24 @@ public partial class Main : Node2D
 	private int _highScore = 0;
 	
 	// Game configuration
-	[Export] public float ScrollSpeed { get; set; } = 0.0f;
-	[Export] public float GroundHeight { get; set; } = 100.0f;
-	[Export] public float PipeDelay { get; set; } = 2.0f;
-	[Export] public float PipeRangeMin { get; set; } = 100.0f;
-	[Export] public float PipeRangeMax { get; set; } = 400.0f;
 	[Export] public float GameOverDelay { get; set; } = 1.0f;
 	
 	// References to game objects
 	private Bird _bird;
 	private Floor _floor;
 	private Pipes _pipes;
+	private BackgroundController _background;
 	private Label _scoreLabel;
-	private Control _gameOverScreen;
-	private Label _gameOverScoreLabel;
-	private Label _gameOverHighScoreLabel;
+	private StartScreen _startScreen;
+	private GameOverScreen _gameOverScreen;
 	
 	// Sound effects
 	private AudioStreamPlayer _flapSound;
 	private AudioStreamPlayer _hitSound;
 	private AudioStreamPlayer _scoreSound;
+	
+	// Timer reference for cleanup
+	private SceneTreeTimer _gameOverTimer;
 	
 	// High score file path
 	private const string SaveFilePath = "user://highscore.save";
@@ -41,10 +39,10 @@ public partial class Main : Node2D
 		_bird = GetNode<Bird>("Bird");
 		_floor = GetNode<Floor>("Floor");
 		_pipes = GetNode<Pipes>("Pipes");
+		_background = GetNode<Parallax2D>("Background") as BackgroundController;
 		_scoreLabel = GetNode<Label>("UI/ScoreLabel");
-		_gameOverScreen = GetNode<Control>("UI/GameOverScreen");
-		_gameOverScoreLabel = GetNode<Label>("UI/GameOverScreen/Panel/VBoxContainer/ScoreLabel");
-		_gameOverHighScoreLabel = GetNode<Label>("UI/GameOverScreen/Panel/VBoxContainer/HighScoreLabel");
+		_startScreen = GetNode<StartScreen>("UI/StartScreen");
+		_gameOverScreen = GetNode<GameOverScreen>("UI/GameOverScreen");
 		
 		// Get sound effects
 		_flapSound = GetNode<AudioStreamPlayer>("Sounds/FlapSound");
@@ -54,22 +52,22 @@ public partial class Main : Node2D
 		// Load high score
 		LoadHighScore();
 		
-		// Set scroll speed for floor
-		_floor?.SetScrollSpeed(ScrollSpeed);
-		
-		// Initialize score display
+		// Initialize UI
 		UpdateScoreDisplay();
-		
-		// Hide game over screen initially
-		if (_gameOverScreen != null)
-		{
-			_gameOverScreen.Visible = false;
-		}
+		_startScreen?.UpdateHighScore(_highScore);
+		_startScreen?.Show();
+		_gameOverScreen?.Hide();
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+	public override void _ExitTree()
 	{
+		// Disconnect timer to prevent memory leak
+		if (_gameOverTimer != null)
+		{
+			_gameOverTimer.Timeout -= ShowGameOverScreen;
+		}
+		
+		base._ExitTree();
 	}
 	
 	public override void _Input(InputEvent @event)
@@ -84,7 +82,7 @@ public partial class Main : Node2D
 				GetViewport().SetInputAsHandled();
 			}
 			// Start the game if not running and not in game over state
-			else if (!_gameRunning && !_gameOver)
+			else if (!_gameRunning && !_gameOver && _startScreen != null && _startScreen.Visible)
 			{
 				StartGame();
 				// Also flap on the first click to start
@@ -111,6 +109,9 @@ public partial class Main : Node2D
 		_gameOver = false;
 		_score = 0;
 		UpdateScoreDisplay();
+		
+		// Hide start screen
+		_startScreen?.Hide();
 		
 		// Start the bird flying to the right
 		_bird?.StartFlying();
@@ -139,15 +140,23 @@ public partial class Main : Node2D
 		// Stop pipe spawning
 		_pipes?.StopSpawning();
 		
-		// Update high score if needed
-		if (_score > _highScore)
+		// Check for new high score
+		bool isNewRecord = _score > _highScore;
+		if (isNewRecord)
 		{
 			_highScore = _score;
 			SaveHighScore();
 		}
 		
-		// Show game over screen after a short delay using CallDeferred
-		GetTree().CreateTimer(GameOverDelay).Timeout += ShowGameOverScreen;
+		// Disconnect old timer if exists
+		if (_gameOverTimer != null)
+		{
+			_gameOverTimer.Timeout -= ShowGameOverScreen;
+		}
+		
+		// Show game over screen after a short delay
+		_gameOverTimer = GetTree().CreateTimer(GameOverDelay);
+		_gameOverTimer.Timeout += ShowGameOverScreen;
 	}
 	
 	public void IncrementScore()
@@ -157,7 +166,6 @@ public partial class Main : Node2D
 			_score++;
 			UpdateScoreDisplay();
 			PlayScoreSound();
-			// GD.Print($"Score: {_score}");
 		}
 	}
 	
@@ -176,29 +184,19 @@ public partial class Main : Node2D
 	
 	private void ShowGameOverScreen()
 	{
-		if (_gameOverScreen != null)
-		{
-			_gameOverScreen.Visible = true;
-		}
-		
-		if (_gameOverScoreLabel != null)
-		{
-			_gameOverScoreLabel.Text = $"Score: {_score}";
-		}
-		
-		if (_gameOverHighScoreLabel != null)
-		{
-			_gameOverHighScoreLabel.Text = $"High Score: {_highScore}";
-		}
+		bool isNewRecord = _score == _highScore && _score > 0;
+		_gameOverScreen?.ShowGameOver(_score, _highScore, isNewRecord);
 	}
 	
 	private void ResetGame()
 	{
-		// Hide game over screen
-		if (_gameOverScreen != null)
-		{
-			_gameOverScreen.Visible = false;
-		}
+		// Change background to a new random one
+		_background?.ChangeBackground();
+		
+		// Hide game over screen, show start screen
+		_gameOverScreen?.Hide();
+		_startScreen?.UpdateHighScore(_highScore);
+		_startScreen?.Show();
 		
 		// Reset game state
 		_gameRunning = false;
@@ -218,7 +216,10 @@ public partial class Main : Node2D
 	
 	private void LoadHighScore()
 	{
-		if (FileAccess.FileExists(SaveFilePath))
+		if (!FileAccess.FileExists(SaveFilePath))
+			return;
+		
+		try
 		{
 			using var file = FileAccess.Open(SaveFilePath, FileAccess.ModeFlags.Read);
 			if (file != null)
@@ -226,12 +227,24 @@ public partial class Main : Node2D
 				_highScore = (int)file.Get32();
 			}
 		}
+		catch (Exception ex)
+		{
+			GD.PushWarning($"Failed to load high score: {ex.Message}");
+			_highScore = 0;
+		}
 	}
 	
 	private void SaveHighScore()
 	{
-		using var file = FileAccess.Open(SaveFilePath, FileAccess.ModeFlags.Write);
-		file?.Store32((uint)_highScore);
+		try
+		{
+			using var file = FileAccess.Open(SaveFilePath, FileAccess.ModeFlags.Write);
+			file?.Store32((uint)_highScore);
+		}
+		catch (Exception ex)
+		{
+			GD.PushError($"Failed to save high score: {ex.Message}");
+		}
 	}
 	
 	private void PlayFlapSound()

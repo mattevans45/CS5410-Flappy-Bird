@@ -3,33 +3,36 @@ using System;
 
 public partial class Pipes : Node2D
 {
+	// Constants for spawn/despawn distances
+	private const float InitialSpawnDistance = 400.0f;
+	private const float DespawnDistance = 800.0f;
+	private const float ResetSpawnDistance = 800.0f;
+	
 	private PackedScene _pipePairScene;
-	private Texture2D _pipeTexture; // Pre-load texture once
 	
 	[Export] public float PipeSpacing { get; set; } = 600.0f; // Distance between pipe pairs
 	[Export] public float GapSize { get; set; } = 200.0f; // Vertical gap between top and bottom pipes
-	[Export] public float MinHeight { get; set; } = 150.0f; // Minimum height for bottom of gap
-	[Export] public float MaxHeight { get; set; } = 450.0f; // Maximum height for bottom of gap
+	[Export] public float MinHeight { get; set; } = 120.0f; // Minimum height for bottom of gap
+	[Export] public float MaxHeight { get; set; } = 500.0f; // Maximum height for bottom of gap
 	[Export] public int InitialPoolSize { get; set; } = 8;
 	[Export] public float SpawnLookahead { get; set; } = 1200.0f;
-	[Export] public string PipeTexturePath { get; set; } = "res://assets/Tiles/Style 1/PipeStyle1.png";
 	
 	private bool _gameRunning = false;
 	private Bird _bird;
-	private float _nextPipeX = 800.0f; // X position for next pipe to spawn
+	private float _nextPipeX; // X position for next pipe to spawn (initialized in _Ready)
 	private System.Collections.Generic.List<Node2D> _activePipes = new System.Collections.Generic.List<Node2D>();
 	
 	// Object pool for reusing pipe pairs
 	private System.Collections.Generic.Queue<Node2D> _pipePool = new System.Collections.Generic.Queue<Node2D>();
-	private RandomNumberGenerator _rng = new RandomNumberGenerator(); // Cached RNG
+	private readonly RandomNumberGenerator _rng = new RandomNumberGenerator();
 	
 	public override void _Ready()
 	{
 		// Pre-load the pipe pair scene
 		_pipePairScene = GD.Load<PackedScene>("res://scenes/pipe_pair.tscn");
 		
-		// Pre-load the pipe texture to avoid loading it every time
-		_pipeTexture = GD.Load<Texture2D>(PipeTexturePath);
+		// Initialize and randomize the RNG
+		_rng.Randomize();
 		
 		// Pre-instantiate pool of pipes
 		for (int i = 0; i < InitialPoolSize; i++)
@@ -43,7 +46,25 @@ public partial class Pipes : Node2D
 		// Get reference to bird
 		_bird = GetNode<Bird>("/root/main/Bird");
 		
-		GD.Print($"Pipes: Initialized with pool of {InitialPoolSize} pipes");
+		// Initialize spawn position relative to bird's starting position
+		if (_bird != null)
+		{
+			_nextPipeX = _bird.GlobalPosition.X + InitialSpawnDistance;
+		}
+		else
+		{
+			_nextPipeX = InitialSpawnDistance;
+		}
+	}
+	
+	public override void _ExitTree()
+	{
+		// Clear collections to allow garbage collection
+		_activePipes?.Clear();
+		_pipePool?.Clear();
+		_bird = null;
+		
+		base._ExitTree();
 	}
 	
 	public override void _Process(double delta)
@@ -51,6 +72,7 @@ public partial class Pipes : Node2D
 		if (!_gameRunning || _bird == null)
 			return;
 		
+		// Cache bird position to avoid repeated property access
 		float birdX = _bird.GlobalPosition.X;
 		
 		// Spawn new pipes ahead of the bird
@@ -66,7 +88,8 @@ public partial class Pipes : Node2D
 			for (int i = _activePipes.Count - 1; i >= 0; i--)
 			{
 				float pipeX = _activePipes[i].GlobalPosition.X;
-				if (pipeX < birdX - 500)
+				// Despawn when pipe is fully off-screen
+				if (pipeX < birdX - DespawnDistance)
 				{
 					// Return to pool instead of destroying
 					ReturnPipeToPool(_activePipes[i]);
@@ -80,13 +103,6 @@ public partial class Pipes : Node2D
 	{
 		var pipePair = _pipePairScene.Instantiate<Node2D>();
 		AddChild(pipePair);
-		
-		// Pre-set the texture on the pipe sprites
-		if (pipePair is PipePair pp && _pipeTexture != null)
-		{
-			pp.SetPreloadedTexture(_pipeTexture);
-		}
-		
 		return pipePair;
 	}
 	
@@ -142,13 +158,11 @@ public partial class Pipes : Node2D
 	public void StartSpawning()
 	{
 		_gameRunning = true;
-		GD.Print("Pipes: Started spawning");
 	}
 	
 	public void StopSpawning()
 	{
 		_gameRunning = false;
-		GD.Print("Pipes: Stopped spawning");
 	}
 	
 	public void ResetPipes()
@@ -166,13 +180,11 @@ public partial class Pipes : Node2D
 		// Reset spawn position
 		if (_bird != null)
 		{
-			_nextPipeX = _bird.GlobalPosition.X + 800.0f;
+			_nextPipeX = _bird.GlobalPosition.X + ResetSpawnDistance;
 		}
 		else
 		{
-			_nextPipeX = 800.0f;
+			_nextPipeX = ResetSpawnDistance;
 		}
-		
-		GD.Print("Pipes: Reset");
 	}
 }

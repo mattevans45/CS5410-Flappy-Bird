@@ -1,17 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://bswguv2aqtmrf"]
+[gd_scene load_steps=3 format=3 uid="uid://bswguv2aqtmrf"]
 
 [ext_resource type="Texture2D" uid="uid://p8q1x1fhbhbj" path="res://assets/Background/Background6-Sheet.png" id="1_bkp1e"]
+[ext_resource type="Script" uid="uid://c8qxm1y5oabkg" path="res://scripts/BackgroundController.cs" id="2_background"]
 
 [node name="Background" type="Parallax2D"]
 z_index = -1
-scroll_scale = Vector2(0.2, 0.5)
+scroll_scale = Vector2(0.1, 0.1)
 repeat_size = Vector2(1024, 0)
-repeat_times = 5
-metadata/_edit_group_ = true
+repeat_times = 2
+script = ExtResource("2_background")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
-position = Vector2(8, 8)
-scale = Vector2(1.015625, 0.6171875)
 texture = ExtResource("1_bkp1e")
 centered = false
+region_enabled = true
+region_rect = Rect2(0, 281, 1024, 743)

@@ -1,7 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://d3uac7wjorfa8"]
+[gd_scene load_steps=3 format=3 uid="uid://d3uac7wjorfa8"]
 
 [ext_resource type="Script" uid="uid://rm6shqd51moq" path="res://scripts/Pipes.cs" id="1_pipes"]
+[ext_resource type="PackedScene" uid="uid://bxqfo2ofoesix" path="res://scenes/pipe_pair.tscn" id="2_3ahhd"]
 
 [node name="Pipes" type="Node2D"]
 texture_filter = 1
 script = ExtResource("1_pipes")
+PipeSpacing = 500.0
+GapSize = 175.0
+MinHeight = 100.0
+MaxHeight = 450.0
+
+[node name="PipePair" parent="." instance=ExtResource("2_3ahhd")]
+visible = false
