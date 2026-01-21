@@ -98,22 +98,22 @@ MinRotation = 0.0
 CeilingY = 0.0
 metadata/_edit_group_ = true
 
-[node name="Camera2D" type="Camera2D" parent="."]
-limit_top = 100
-limit_bottom = 548
-limit_smoothed = true
-position_smoothing_enabled = true
-rotation_smoothing_enabled = true
-
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 self_modulate = Color(1.353256, 1.353256, 1.353256, 1)
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_3po83")
 animation = &"flying"
 autoplay = "idle"
-frame_progress = 0.8829174
+frame_progress = 0.596535
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 1.1920929e-07)
 scale = Vector2(1.1, 0.87)
 shape = SubResource("CapsuleShape2D_hq4t0")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+limit_top = 100
+limit_bottom = 548
+limit_smoothed = true
+position_smoothing_enabled = true
+rotation_smoothing_enabled = true

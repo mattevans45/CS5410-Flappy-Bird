@@ -3,19 +3,8 @@ using System;
 
 public partial class BackgroundController : Parallax2D
 {
-	// Array of background texture paths (these are full backgrounds, not sheets)
-	private static readonly string[] BackgroundPaths = new[]
-	{
-		"res://assets/Background/Background1.png",
-		"res://assets/Background/Background2.png",
-		"res://assets/Background/Background3.png",
-		"res://assets/Background/Background4.png",
-		"res://assets/Background/Background5.png",
-		"res://assets/Background/Background6.png",
-		"res://assets/Background/Background7.png",
-		"res://assets/Background/Background8.png",
-		"res://assets/Background/Background9.png"
-	};
+	// Array of background textures (assign in editor)
+	[Export] public Texture2D[] BackgroundTextures { get; set; }
 	
 	private Sprite2D _sprite;
 	private readonly RandomNumberGenerator _rng = new RandomNumberGenerator();
@@ -38,9 +27,9 @@ public partial class BackgroundController : Parallax2D
 			_sprite = GetNode<Sprite2D>("Sprite2D");
 		}
 		
-		if (_sprite == null || BackgroundPaths.Length == 0)
+		if (_sprite == null || BackgroundTextures == null || BackgroundTextures.Length == 0)
 		{
-			GD.PrintErr("BackgroundController: Sprite2D not found or no backgrounds available");
+			GD.PrintErr("BackgroundController: Sprite2D not found or no backgrounds assigned in editor");
 			return;
 		}
 		
@@ -48,13 +37,13 @@ public partial class BackgroundController : Parallax2D
 		int newIndex;
 		do
 		{
-			newIndex = _rng.RandiRange(0, BackgroundPaths.Length - 1);
-		} while (newIndex == _currentBackgroundIndex && BackgroundPaths.Length > 1);
+			newIndex = _rng.RandiRange(0, BackgroundTextures.Length - 1);
+		} while (newIndex == _currentBackgroundIndex && BackgroundTextures.Length > 1);
 		
 		_currentBackgroundIndex = newIndex;
 		
-		// Load and apply the new texture
-		var texture = GD.Load<Texture2D>(BackgroundPaths[_currentBackgroundIndex]);
+		// Apply the texture (already pre-loaded)
+		var texture = BackgroundTextures[_currentBackgroundIndex];
 		if (texture != null)
 		{
 			_sprite.Texture = texture;

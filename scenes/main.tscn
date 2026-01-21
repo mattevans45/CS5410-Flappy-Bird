@@ -1,19 +1,25 @@
-[gd_scene load_steps=12 format=3 uid="uid://d1uqtum4t7uku"]
+[gd_scene load_steps=16 format=3 uid="uid://d1uqtum4t7uku"]
 
 [ext_resource type="PackedScene" uid="uid://bswguv2aqtmrf" path="res://scenes/background.tscn" id="1_tbgi4"]
 [ext_resource type="Script" uid="uid://b77rwkobcom3j" path="res://scripts/Main.cs" id="1_tefeu"]
 [ext_resource type="PackedScene" uid="uid://d3uac7wjorfa8" path="res://scenes/pipes.tscn" id="2_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://daup3whagkygu" path="res://scenes/floor.tscn" id="3_tbgi4"]
+[ext_resource type="Texture2D" uid="uid://qdwjqy35o1py" path="res://assets/icons/volume_off_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="4_mute"]
 [ext_resource type="FontFile" uid="uid://bd4rqaj8gnyhv" path="res://assets/fonts/Silkscreen-Regular.ttf" id="5_font"]
+[ext_resource type="Texture2D" uid="uid://c4004kjkbv8yv" path="res://assets/icons/volume_up_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="5_unmute"]
 [ext_resource type="AudioStream" uid="uid://ckvulw0ujq0yp" path="res://assets/Audio/wing-flap-1-6434.mp3" id="6_o6xl0"]
 [ext_resource type="AudioStream" uid="uid://c3160pmgb7511" path="res://assets/Audio/splat-305791.mp3" id="7_85g3d"]
 [ext_resource type="PackedScene" uid="uid://enka6wakk8k7" path="res://scenes/bird.tscn" id="7_tipki"]
 [ext_resource type="AudioStream" uid="uid://cx5q7hiiqwf38" path="res://assets/Audio/point.mp3" id="8_tipki"]
 [ext_resource type="PackedScene" uid="uid://ckol5pcc70mlu" path="res://scenes/start_screen.tscn" id="9_start"]
 [ext_resource type="PackedScene" uid="uid://k60igdnw6cjk" path="res://scenes/game_over_screen.tscn" id="10_gameover"]
+[ext_resource type="AudioStream" uid="uid://bcr4lv1n5vxut" path="res://assets/Audio/osrs-sea-shanty-2.mp3" id="11_seashanty"]
+[ext_resource type="AudioStream" uid="uid://c1ovd5ojln0xl" path="res://assets/Audio/duck-hunt-laugh.mp3" id="12_duckhunt"]
 
 [node name="main" type="Node2D"]
 script = ExtResource("1_tefeu")
+IconMute = ExtResource("4_mute")
+IconUnmute = ExtResource("5_unmute")
 
 [node name="Pipes" parent="." instance=ExtResource("2_jyhfs")]
 PipeSpacing = 400.0
@@ -60,6 +66,17 @@ vertical_alignment = 1
 visible = false
 
 [node name="Sounds" type="Node" parent="."]
+
+[node name="StartScreenMusic" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("11_seashanty")
+volume_db = -20.991
+pitch_scale = 0.85
+autoplay = true
+parameters/looping = true
+
+[node name="GameOverSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("12_duckhunt")
+volume_db = -31.794
 
 [node name="FlapSound" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("6_o6xl0")

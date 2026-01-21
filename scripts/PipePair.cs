@@ -56,16 +56,6 @@ public partial class PipePair : Node2D
 		if (!Engine.IsEditorHint())
 		{
 			_scoreArea.BodyEntered += OnScoreAreaEntered;
-			
-			// Connect hit areas
-			var topHitArea = _topPipe.GetNodeOrNull<Area2D>("HitArea");
-			var bottomHitArea = _bottomPipe.GetNodeOrNull<Area2D>("HitArea");
-			
-			if (topHitArea != null)
-				topHitArea.BodyEntered += OnPipeHit;
-			
-			if (bottomHitArea != null)
-				bottomHitArea.BodyEntered += OnPipeHit;
 		}
 	}
 	
@@ -112,20 +102,6 @@ public partial class PipePair : Node2D
 			{
 				_scoreArea.BodyEntered -= OnScoreAreaEntered;
 			}
-			
-			// Critical: Disconnect HitArea signals to prevent pooled object leaks
-			var topHitArea = _topPipe?.GetNodeOrNull<Area2D>("HitArea");
-			var bottomHitArea = _bottomPipe?.GetNodeOrNull<Area2D>("HitArea");
-			
-			if (topHitArea != null && IsInstanceValid(topHitArea))
-			{
-				topHitArea.BodyEntered -= OnPipeHit;
-			}
-			
-			if (bottomHitArea != null && IsInstanceValid(bottomHitArea))
-			{
-				bottomHitArea.BodyEntered -= OnPipeHit;
-			}
 		}
 		
 		base._ExitTree();
@@ -144,13 +120,7 @@ public partial class PipePair : Node2D
 		}
 	}
 	
-	private void OnPipeHit(Node2D body)
-	{
-		if (body is Bird bird)
-		{
-			bird.OnPipeHit();
-		}
-	}
+
 	
 
 }

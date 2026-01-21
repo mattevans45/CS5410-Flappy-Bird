@@ -20,17 +20,32 @@ public partial class Main : Node2D
 	private Label _scoreLabel;
 	private StartScreen _startScreen;
 	private GameOverScreen _gameOverScreen;
+	private Button _muteButton;
 	
 	// Sound effects
 	private AudioStreamPlayer _flapSound;
 	private AudioStreamPlayer _hitSound;
 	private AudioStreamPlayer _scoreSound;
+	private AudioStreamPlayer _startScreenMusic;
+	private AudioStreamPlayer _gameOverSound;
 	
 	// Timer reference for cleanup
 	private SceneTreeTimer _gameOverTimer;
 	
 	// High score file path
 	private const string SaveFilePath = "user://highscore.save";
+	
+	// Mute state
+	private bool _isMuted = false;
+	[Export] public Texture2D IconMute { get; set; }
+	[Export] public Texture2D IconUnmute { get; set; }
+	
+	// Original audio settings
+	private float _originalFlapVolume;
+	private float _originalHitVolume;
+	private float _originalScoreVolume;
+	private float _originalStartMusicVolume;
+	private float _originalGameOverVolume;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -43,11 +58,21 @@ public partial class Main : Node2D
 		_scoreLabel = GetNode<Label>("UI/ScoreLabel");
 		_startScreen = GetNode<StartScreen>("UI/StartScreen");
 		_gameOverScreen = GetNode<GameOverScreen>("UI/GameOverScreen");
+		_muteButton = GetNode<Button>("UI/StartScreen/MuteButton");
 		
 		// Get sound effects
 		_flapSound = GetNode<AudioStreamPlayer>("Sounds/FlapSound");
 		_hitSound = GetNode<AudioStreamPlayer>("Sounds/HitSound");
 		_scoreSound = GetNode<AudioStreamPlayer>("Sounds/ScoreSound");
+		_startScreenMusic = GetNode<AudioStreamPlayer>("Sounds/StartScreenMusic");
+		_gameOverSound = GetNode<AudioStreamPlayer>("Sounds/GameOverSound");
+		
+		// Store original audio volumes
+		_originalFlapVolume = _flapSound.VolumeDb;
+		_originalHitVolume = _hitSound.VolumeDb;
+		_originalScoreVolume = _scoreSound.VolumeDb;
+		_originalStartMusicVolume = _startScreenMusic.VolumeDb;
+		_originalGameOverVolume = _gameOverSound.VolumeDb;
 		
 		// Load high score
 		LoadHighScore();
@@ -57,6 +82,15 @@ public partial class Main : Node2D
 		_startScreen?.UpdateHighScore(_highScore);
 		_startScreen?.Show();
 		_gameOverScreen?.Hide();
+		// Play start screen music
+		_startScreenMusic?.Play();
+		
+		// Set initial mute button icon
+		if (_muteButton != null && IconUnmute != null)
+		{
+			_muteButton.Icon = IconUnmute;
+			_muteButton.Pressed += OnMuteButtonPressed;
+		}
 	}
 
 	public override void _ExitTree()
@@ -67,12 +101,18 @@ public partial class Main : Node2D
 			_gameOverTimer.Timeout -= ShowGameOverScreen;
 		}
 		
+		// Disconnect mute button event to prevent memory leak
+		if (_muteButton != null)
+		{
+			_muteButton.Pressed -= OnMuteButtonPressed;
+		}
+		
 		base._ExitTree();
 	}
 	
-	public override void _Input(InputEvent @event)
+	public override void _UnhandledInput(InputEvent @event)
 	{
-		// Handle mouse button click (use _Input instead of _UnhandledInput so UI doesn't block it)
+		// Handle mouse button click (use _UnhandledInput so UI elements like buttons can handle input first)
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.Pressed)
 		{
 			// Restart game if game over screen is shown
@@ -112,6 +152,8 @@ public partial class Main : Node2D
 		
 		// Hide start screen
 		_startScreen?.Hide();
+		// Stop start screen music
+		_startScreenMusic?.Stop();
 		
 		// Start the bird flying to the right
 		_bird?.StartFlying();
@@ -186,17 +228,20 @@ public partial class Main : Node2D
 	{
 		bool isNewRecord = _score == _highScore && _score > 0;
 		_gameOverScreen?.ShowGameOver(_score, _highScore, isNewRecord);
+		// Play game over sound (duck hunt laugh)
+		_gameOverSound?.Play();
 	}
 	
 	private void ResetGame()
 	{
 		// Change background to a new random one
 		_background?.ChangeBackground();
-		
 		// Hide game over screen, show start screen
 		_gameOverScreen?.Hide();
 		_startScreen?.UpdateHighScore(_highScore);
 		_startScreen?.Show();
+		// Play start screen music again
+		_startScreenMusic?.Play();
 		
 		// Reset game state
 		_gameRunning = false;
@@ -247,27 +292,45 @@ public partial class Main : Node2D
 		}
 	}
 	
-	private void PlayFlapSound()
+	private void PlaySound(AudioStreamPlayer sound)
 	{
-		if (_flapSound != null && _flapSound.Stream != null)
+		if (sound != null && sound.Stream != null)
 		{
-			_flapSound.Play();
+			sound.Play();
 		}
 	}
 	
-	private void PlayHitSound()
-	{
-		if (_hitSound != null && _hitSound.Stream != null)
-		{
-			_hitSound.Play();
-		}
-	}
+	private void PlayFlapSound() => PlaySound(_flapSound);
+	private void PlayHitSound() => PlaySound(_hitSound);
+	private void PlayScoreSound() => PlaySound(_scoreSound);
 	
-	private void PlayScoreSound()
+	private void OnMuteButtonPressed()
 	{
-		if (_scoreSound != null && _scoreSound.Stream != null)
+		_isMuted = !_isMuted;
+		
+		if (_isMuted)
 		{
-			_scoreSound.Play();
+			// Mute all sounds to -80 dB (effectively silent)
+			_flapSound.VolumeDb = -80f;
+			_hitSound.VolumeDb = -80f;
+			_scoreSound.VolumeDb = -80f;
+			_startScreenMusic.VolumeDb = -80f;
+			_gameOverSound.VolumeDb = -80f;
+		}
+		else
+		{
+			// Restore original volumes
+			_flapSound.VolumeDb = _originalFlapVolume;
+			_hitSound.VolumeDb = _originalHitVolume;
+			_scoreSound.VolumeDb = _originalScoreVolume;
+			_startScreenMusic.VolumeDb = _originalStartMusicVolume;
+			_gameOverSound.VolumeDb = _originalGameOverVolume;
+		}
+		
+		// Switch icon
+		if (_muteButton != null)
+		{
+			_muteButton.Icon = _isMuted ? IconMute : IconUnmute;
 		}
 	}
 }

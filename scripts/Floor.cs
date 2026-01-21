@@ -42,18 +42,23 @@ public partial class Floor : Node2D
 	public override void _ExitTree()
 	{
 		// Disconnect signals to prevent memory leak
-		var area1 = GetNodeOrNull<Area2D>("FloorSegment1/Area2D");
-		var area2 = GetNodeOrNull<Area2D>("FloorSegment2/Area2D");
-		
-		if (area1 != null && IsInstanceValid(area1))
+		if (_area1 != null && IsInstanceValid(_area1))
 		{
-			area1.BodyEntered -= OnBodyEntered;
+			_area1.BodyEntered -= OnBodyEntered;
 		}
 		
-		if (area2 != null && IsInstanceValid(area2))
+		if (_area2 != null && IsInstanceValid(_area2))
 		{
-			area2.BodyEntered -= OnBodyEntered;
+			_area2.BodyEntered -= OnBodyEntered;
 		}
+		
+		// Clear references to allow garbage collection
+		_segment1 = null;
+		_segment2 = null;
+		_area1 = null;
+		_area2 = null;
+		_bird = null;
+		_mainScene = null;
 		
 		base._ExitTree();
 	}

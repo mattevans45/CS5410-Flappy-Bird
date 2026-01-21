@@ -100,6 +100,18 @@ public partial class Bird : CharacterBody2D
 		Velocity = velocity;
 		MoveAndSlide();
 
+		// Check for collisions with pipes
+		for (int i = 0; i < GetSlideCollisionCount(); i++)
+		{
+			var collision = GetSlideCollision(i);
+			if (collision != null && collision.GetCollider() is StaticBody2D collider)
+			{
+				// Optionally, check collider.Name == "TopPipe" or "BottomPipe" for stricter match
+				OnPipeHit();
+				break;
+			}
+		}
+
 		// Rotate based on y velocity - simple function with clamping
 		Rotation = Mathf.Clamp(velocity.Y * RotationScale, MinRotation, MaxRotation);
 	}

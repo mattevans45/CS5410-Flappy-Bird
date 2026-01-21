@@ -6,9 +6,11 @@
 [node name="Pipes" type="Node2D"]
 texture_filter = 1
 script = ExtResource("1_pipes")
+PipePairScene = ExtResource("2_3ahhd")
 PipeSpacing = 500.0
 GapSize = 175.0
 MinHeight = 100.0
 MaxHeight = 450.0
 
 [node name="PipePair" parent="." instance=ExtResource("2_3ahhd")]
+visible = false

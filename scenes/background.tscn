@@ -1,7 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://bswguv2aqtmrf"]
+[gd_scene load_steps=12 format=3 uid="uid://bswguv2aqtmrf"]
 
 [ext_resource type="Texture2D" uid="uid://p8q1x1fhbhbj" path="res://assets/Background/Background6-Sheet.png" id="1_bkp1e"]
 [ext_resource type="Script" uid="uid://c8qxm1y5oabkg" path="res://scripts/BackgroundController.cs" id="2_background"]
+[ext_resource type="Texture2D" uid="uid://bmb1b87t2v4hh" path="res://assets/Background/Background1.png" id="3_bg1"]
+[ext_resource type="Texture2D" uid="uid://cjurmm7s4lv2e" path="res://assets/Background/Background2.png" id="4_bg2"]
+[ext_resource type="Texture2D" uid="uid://cdhin0jbtujvn" path="res://assets/Background/Background3.png" id="5_bg3"]
+[ext_resource type="Texture2D" uid="uid://c2tejb0miqdhl" path="res://assets/Background/Background4.png" id="6_bg4"]
+[ext_resource type="Texture2D" uid="uid://cr0arfe4ywxwk" path="res://assets/Background/Background5.png" id="7_bg5"]
+[ext_resource type="Texture2D" uid="uid://d06t0x7psl0tw" path="res://assets/Background/Background6.png" id="8_bg6"]
+[ext_resource type="Texture2D" uid="uid://bmdnre2kkjgqb" path="res://assets/Background/Background7.png" id="9_bg7"]
+[ext_resource type="Texture2D" uid="uid://ikvli2sf7p3x" path="res://assets/Background/Background8.png" id="10_bg8"]
+[ext_resource type="Texture2D" uid="uid://cebgllryaye3e" path="res://assets/Background/Background9.png" id="11_bg9"]
 
 [node name="Background" type="Parallax2D"]
 z_index = -1
@@ -9,6 +18,7 @@ scroll_scale = Vector2(0.1, 0.1)
 repeat_size = Vector2(1024, 0)
 repeat_times = 2
 script = ExtResource("2_background")
+BackgroundTextures = Array[Texture2D]([ExtResource("3_bg1"), ExtResource("4_bg2"), ExtResource("5_bg3"), ExtResource("6_bg4"), ExtResource("7_bg5"), ExtResource("8_bg6"), ExtResource("10_bg8"), ExtResource("9_bg7"), ExtResource("11_bg9")])
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1

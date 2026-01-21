@@ -8,7 +8,7 @@ public partial class Pipes : Node2D
 	private const float DespawnDistance = 800.0f;
 	private const float ResetSpawnDistance = 800.0f;
 	
-	private PackedScene _pipePairScene;
+	[Export] public PackedScene PipePairScene { get; set; }
 	
 	[Export] public float PipeSpacing { get; set; } = 600.0f; // Distance between pipe pairs
 	[Export] public float GapSize { get; set; } = 200.0f; // Vertical gap between top and bottom pipes
@@ -28,9 +28,6 @@ public partial class Pipes : Node2D
 	
 	public override void _Ready()
 	{
-		// Pre-load the pipe pair scene
-		_pipePairScene = GD.Load<PackedScene>("res://scenes/pipe_pair.tscn");
-		
 		// Initialize and randomize the RNG
 		_rng.Randomize();
 		
@@ -101,7 +98,13 @@ public partial class Pipes : Node2D
 	
 	private Node2D CreateNewPipePair()
 	{
-		var pipePair = _pipePairScene.Instantiate<Node2D>();
+		if (PipePairScene == null)
+		{
+			GD.PushError("Pipes: PipePairScene not assigned in editor!");
+			return null;
+		}
+		
+		var pipePair = PipePairScene.Instantiate<Node2D>();
 		AddChild(pipePair);
 		return pipePair;
 	}
